@@ -86,6 +86,7 @@ These propagate to every metric data point and trace span, enabling per-user fil
 | `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | — | Explicit OTLP HTTP metrics endpoint override |
 | `OTEL_SERVICE_NAME` | `pi-coding-agent` | Service name in traces |
 | `PI_OTEL_ENABLED` | `true` | Set to `false` to disable |
+| `PI_OTEL_TRACES_ENABLED` | `true` | Set to `false` to export metrics without spans |
 | `PI_OTEL_DEBUG` | `false` | Set to `true` to also log spans/metrics to console |
 | `OTEL_METRIC_EXPORT_INTERVAL` | `10000` | Metric export interval in ms |
 | `PI_OTEL_USER_EMAIL` | `git config user.email` | Override user email |

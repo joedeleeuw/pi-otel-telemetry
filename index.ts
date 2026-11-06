@@ -106,9 +106,11 @@ export default function (pi: ExtensionAPI) {
   // --- Trace provider ---
   const traceProvider = new NodeTracerProvider({ resource });
 
-  traceProvider.addSpanProcessor(
-    new BatchSpanProcessor(new OTLPTraceExporter({ url: tracesEndpoint }))
-  );
+  if (process.env.PI_OTEL_TRACES_ENABLED !== "false") {
+    traceProvider.addSpanProcessor(
+      new BatchSpanProcessor(new OTLPTraceExporter({ url: tracesEndpoint }))
+    );
+  }
   if (debug) {
     traceProvider.addSpanProcessor(new BatchSpanProcessor(new ConsoleSpanExporter()));
   }
