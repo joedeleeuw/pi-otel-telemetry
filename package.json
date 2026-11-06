@@ -24,6 +24,6 @@
     "@sinclair/typebox": "*"
   },
   "pi": {
-    "extensions": ["./index.ts"]
+    "extensions": ["./index.ts", "./memoryrepo.ts"]
   }
 }
