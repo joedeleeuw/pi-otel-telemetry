@@ -1,8 +1,5 @@
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
+import { spawn } from "node:child_process";
 import type { ExtensionAPI, ExtensionContext } from "@mariozechner/pi-coding-agent";
-
-const execute = promisify(execFile);
 const HOOK = process.env.MEMORYREPO_HOOK ?? `${process.env.HOME}/.local/bin/dotfiles-memory-hook`;
 
 type MemoryResult = {
@@ -28,11 +25,20 @@ function textOf(message: ContentMessage): string {
 }
 
 async function memory(event: "recall" | "capture", payload: Record<string, unknown>): Promise<MemoryResult> {
-  const { stdout } = await execute(HOOK, ["pi", event], {
-    input: JSON.stringify(payload),
-    timeout: 10_000,
-    maxBuffer: 1024 * 1024,
+  const child = spawn(HOOK, ["pi", event], { stdio: ["pipe", "pipe", "pipe"] });
+  let stdout = "";
+  let stderr = "";
+  child.stdout.setEncoding("utf8");
+  child.stderr.setEncoding("utf8");
+  child.stdout.on("data", (chunk: string) => { stdout += chunk; });
+  child.stderr.on("data", (chunk: string) => { stderr += chunk; });
+  const exit = new Promise<number>((resolve, reject) => {
+    child.once("error", reject);
+    child.once("close", (code) => resolve(code ?? -1));
   });
+  child.stdin.end(JSON.stringify(payload));
+  const code = await exit;
+  if (code !== 0) throw new Error(stderr.trim() || stdout.trim() || `dotfiles-memory-hook exited ${code}`);
   return JSON.parse(stdout) as MemoryResult;
 }
 
