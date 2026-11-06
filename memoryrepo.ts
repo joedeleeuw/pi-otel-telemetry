@@ -24,7 +24,7 @@ function textOf(message: ContentMessage): string {
   }).join("\n");
 }
 
-async function memory(event: "recall" | "capture", payload: Record<string, unknown>): Promise<MemoryResult> {
+async function memoryUnchecked(event: "recall" | "capture", payload: Record<string, unknown>): Promise<MemoryResult> {
   const child = spawn(HOOK, ["pi", event], { stdio: ["pipe", "pipe", "pipe"] });
   let stdout = "";
   let stderr = "";
@@ -40,6 +40,14 @@ async function memory(event: "recall" | "capture", payload: Record<string, unkno
   const code = await exit;
   if (code !== 0) throw new Error(stderr.trim() || stdout.trim() || `dotfiles-memory-hook exited ${code}`);
   return JSON.parse(stdout) as MemoryResult;
+}
+
+async function memory(event: "recall" | "capture", payload: Record<string, unknown>): Promise<MemoryResult> {
+  try {
+    return await memoryUnchecked(event, payload);
+  } catch (error) {
+    return { ok: false, code: "request_failed", message: error instanceof Error ? error.message : String(error) };
+  }
 }
 
 function notify(ctx: ExtensionContext, result: MemoryResult): void {
