@@ -84,6 +84,7 @@ These propagate to every metric data point and trace span, enabling per-user fil
 | `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://localhost:4318` | Base OTLP HTTP endpoint. `/v1/traces` and `/v1/metrics` are appended automatically unless per-signal endpoints are set. |
 | `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` | — | Explicit OTLP HTTP traces endpoint override |
 | `OTEL_EXPORTER_OTLP_METRICS_ENDPOINT` | — | Explicit OTLP HTTP metrics endpoint override |
+| `OTEL_EXPORTER_OTLP_HEADERS` | — | Comma-separated `key=value` headers for trace and metric exports |
 | `OTEL_SERVICE_NAME` | `pi-coding-agent` | Service name in traces |
 | `PI_OTEL_ENABLED` | `true` | Set to `false` to disable |
 | `PI_OTEL_TRACES_ENABLED` | `true` | Set to `false` to export metrics without spans |

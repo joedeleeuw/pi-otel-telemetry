@@ -64,6 +64,11 @@ export default function (pi: ExtensionAPI) {
     process.env.OTEL_EXPORTER_OTLP_METRICS_ENDPOINT || endpoint,
     "metrics"
   );
+  const headers: Record<string, string> = {};
+  for (const pair of (process.env.OTEL_EXPORTER_OTLP_HEADERS || "").split(",")) {
+    const separator = pair.indexOf("=");
+    if (separator > 0) headers[pair.slice(0, separator).trim()] = pair.slice(separator + 1).trim();
+  }
 
   // --- Resolve account identity ---
   const account = resolveAccount();
@@ -108,7 +113,7 @@ export default function (pi: ExtensionAPI) {
 
   if (process.env.PI_OTEL_TRACES_ENABLED !== "false") {
     traceProvider.addSpanProcessor(
-      new BatchSpanProcessor(new OTLPTraceExporter({ url: tracesEndpoint }))
+      new BatchSpanProcessor(new OTLPTraceExporter({ url: tracesEndpoint, headers }))
     );
   }
   if (debug) {
@@ -122,7 +127,7 @@ export default function (pi: ExtensionAPI) {
 
   // --- Metric provider ---
   const metricReader = new PeriodicExportingMetricReader({
-    exporter: new OTLPMetricExporter({ url: metricsEndpoint }),
+    exporter: new OTLPMetricExporter({ url: metricsEndpoint, headers }),
     exportIntervalMillis: metricInterval,
   });
 
