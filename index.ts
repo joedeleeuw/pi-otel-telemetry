@@ -339,7 +339,6 @@ export default function (pi: ExtensionAPI) {
         attributes: {
           "tool.name": event.toolName,
           "tool.call_id": event.toolCallId,
-          "tool.args_summary": summarizeArgs(event.toolName, event.args),
         },
       },
       turnCtx
@@ -409,35 +408,6 @@ export default function (pi: ExtensionAPI) {
       });
     }
   });
-}
-
-/**
- * Create a brief summary of tool arguments for span attributes.
- * Avoids dumping large content into traces.
- */
-function summarizeArgs(toolName: string, args: any): string {
-  if (!args) return "";
-
-  switch (toolName) {
-    case "bash":
-      return truncate(args.command ?? "", 200);
-    case "read":
-      return args.path ?? "";
-    case "write":
-      return args.path ?? "";
-    case "edit":
-      return args.path ?? "";
-    default:
-      try {
-        return truncate(JSON.stringify(args), 200);
-      } catch {
-        return "[unserializable]";
-      }
-  }
-}
-
-function truncate(str: string, maxLen: number): string {
-  return str.length > maxLen ? str.slice(0, maxLen) + "…" : str;
 }
 
 /**
